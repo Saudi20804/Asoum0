@@ -3,186 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إلى الأبد مع أسمى</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <title>اسووم</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: radial-gradient(circle at center, #2d0b16 0%, #000000 100%);
-            color: white;
-            font-family: 'Cairo', sans-serif;
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden; /* عشان الكلام ميعملش سكرول */
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            height: 100vh;
         }
 
-        /* خلفية النجوم المتحركة */
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        .glass-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 40px;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        .main-title {
-            font-size: 2rem;
-            background: linear-gradient(to right, #ff4d6d, #ffb3c1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-        }
-
-        .typewriter {
-            height: 60px;
-            font-size: 1.2rem;
-            color: #ffccd5;
-            margin-bottom: 20px;
-        }
-
-        .timer-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 30px 0;
-        }
-
-        .timer-item {
-            background: rgba(255, 77, 109, 0.1);
-            border: 1px solid rgba(255, 77, 109, 0.3);
-            border-radius: 15px;
-            padding: 10px;
-            width: 22%;
-        }
-
-        .timer-num { font-size: 1.5rem; font-weight: bold; color: #ff4d6d; display: block; }
-        .timer-txt { font-size: 0.7rem; color: #ffccd5; }
-
-        .vow-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            padding: 15px;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            border-right: 4px solid #ff4d6d;
-        }
-
-        .btn-yes {
-            background: #ff4d6d;
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 50px;
+        #main-btn {
+            padding: 20px 40px;
+            font-size: 1.5rem;
             font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
-            transition: 0.3s;
-        }
-
-        #btn-no {
-            background: rgba(255, 255, 255, 0.1);
-            color: #aaa;
-            padding: 10px 25px;
+            color: #fff;
+            background-color: #ff4d6d;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            position: absolute;
+            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
             z-index: 1000;
+            transition: transform 0.2s;
+        }
+
+        #main-btn:active {
+            transform: scale(0.9);
+        }
+
+        .zakri {
+            position: absolute;
+            font-weight: 900;
+            pointer-events: none;
+            user-select: none;
+            animation: popIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            100% { transform: scale(1) rotate(var(--rot)); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+    <button id="main-btn">دوسي هنا يا اسووم ❤️</button>
 
-<div class="glass-container">
-    <h1 class="main-title">يا ست البنات ❤️</h1>
-    
-    <div class="typewriter" id="typewriter"></div>
+    <script>
+        const btn = document.getElementById('main-btn');
+        const colors = ['#ff4d6d', '#c2185b', '#ff758f', '#a4133c', '#590d22'];
 
-    <div class="timer-row">
-        <div class="timer-item"><span class="timer-num" id="d">0</span><span class="timer-txt">يوم</span></div>
-        <div class="timer-item"><span class="timer-num" id="h">0</span><span class="timer-txt">ساعة</span></div>
-        <div class="timer-item"><span class="timer-num" id="m">0</span><span class="timer-txt">دقيقة</span></div>
-        <div class="timer-item"><span class="timer-num" id="s">0</span><span class="timer-txt">ثانية</span></div>
-    </div>
+        btn.addEventListener('click', () => {
+            // نخفي الزرار أول ما تدوس
+            btn.style.display = 'none';
 
-    <div class="vow-box">
-        أخلص جيشي ونتجوز <br> ونبني أحلى بيت في سبتمبر 2027 سوا 🏠
-    </div>
-
-    <div style="height: 100px; display: flex; align-items: center; justify-content: center; gap: 20px;">
-        <button class="btn-yes" onclick="celebrate()">أيوة طبعاً!</button>
-        <button id="btn-no" onmouseover="moveNo()">لأ</button>
-    </div>
-</div>
-
-<script>
-    // 1. تأثير الكتابة
-    const text = ["يا عبدالله بقى..", ".. كدا يعني! 😂", "عارف إنك بتقوليها كتير..", "بس طالعة منك زي العسل!"];
-    let i = 0, j = 0, isDeleting = false;
-    function type() {
-        const current = text[i];
-        document.getElementById('typewriter').innerHTML = current.substring(0, j);
-        if (!isDeleting && j < current.length) j++;
-        else if (isDeleting && j > 0) j--;
-        else { isDeleting = !isDeleting; i = (i + 1) % text.length; }
-        setTimeout(type, isDeleting ? 50 : 150);
-    }
-    type();
-
-    // 2. العداد
-    const start = new Date("March 29, 2026 19:00:00").getTime();
-    setInterval(() => {
-        const now = new Date().getTime();
-        const diff = now - start;
-        document.getElementById('d').innerText = Math.floor(diff / 86400000);
-        document.getElementById('h').innerText = Math.floor((diff % 86400000) / 3600000);
-        document.getElementById('m').innerText = Math.floor((diff % 3600000) / 60000);
-        document.getElementById('s').innerText = Math.floor((diff % 60000) / 1000);
-    }, 1000);
-
-    // 3. الزرار الشقي
-    function moveNo() {
-        const b = document.getElementById('btn-no');
-        b.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-        b.style.top = Math.random() * (window.innerHeight - 50) + 'px';
-    }
-
-    // 4. الاحتفال (Confetti)
-    function celebrate() {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff4d6d', '#ffffff'] });
-        alert("يا روح قلب عبدالله.. وأنا بعشقك كدا يعني! ❤️");
-    }
-
-    // 5. خلفية النجوم (Canvas)
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const stars = Array(200).fill().map(() => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5 }));
-    function drawStars() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "white";
-        stars.forEach(s => {
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-            ctx.fill();
-            s.y = (s.y + 0.2) % canvas.height;
+            // نكرر الكلمة 150 مرة في كل حتة
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    createZakri();
+                }, i * 30); // الكلمات تظهر ورا بعض بسرعة
+            }
         });
-        requestAnimationFrame(drawStars);
-    }
-    drawStars();
-</script>
 
+        function createZakri() {
+            const el = document.createElement('div');
+            el.className = 'zakri';
+            el.innerText = 'ذاااكري';
+            
+            // أماكن عشوائية
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            
+            // أحجام وزوايا عشوائية
+            const size = Math.floor(Math.random() * 30) + 20; // من 20 لـ 50 px
+            const rotation = Math.floor(Math.random() * 60) - 30; // زاوية ميل
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.fontSize = size + 'px';
+            el.style.color = color;
+            el.style.setProperty('--rot', rotation + 'deg');
+
+            document.body.appendChild(el);
+        }
+    </script>
 </body>
 </html>
