@@ -3,94 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اسووم</title>
+    <title>مفاجأة لأسماء</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden; /* عشان الكلام ميعملش سكرول */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+        body { margin: 0; background: #fff; font-family: 'Arial', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+        .page { display: none; flex-direction: column; align-items: center; justify-content: center; width: 90%; }
+        .active { display: flex; }
+        
+        h1 { color: #c2185b; margin-bottom: 30px; font-size: 1.8rem; }
+        button { padding: 15px 30px; font-size: 1.2rem; font-weight: bold; color: #fff; background-color: #ff4d6d; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s; margin: 10px; }
+        button:active { transform: scale(0.9); }
+        
+        .btn-group { display: flex; gap: 15px; }
+        .btn-no { background-color: #888; }
 
-        #main-btn {
-            padding: 20px 40px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            background-color: #ff4d6d;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
-            z-index: 1000;
-            transition: transform 0.2s;
-        }
-
-        #main-btn:active {
-            transform: scale(0.9);
-        }
-
-        .zakri {
-            position: absolute;
-            font-weight: 900;
-            pointer-events: none;
-            user-select: none;
-            animation: popIn 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0) rotate(0deg); opacity: 0; }
-            100% { transform: scale(1) rotate(var(--rot)); opacity: 1; }
-        }
+        .zakri-item { position: absolute; font-weight: 900; pointer-events: none; white-space: nowrap; transition: 0.3s; }
     </style>
 </head>
 <body>
 
-    <button id="main-btn">دوسي هنا يا اسووم ❤️</button>
+    <div id="page1" class="page active">
+        <button onclick="showPage('page2')">دوسي هنا يا اسووم ❤️</button>
+    </div>
+
+    <div id="page2" class="page">
+        <h1>عايز اقولك علي حاجة مهمه🌚</h1>
+        <button onclick="showPage('page3')">دوسي هنا تاني يا اسووم 😉</button>
+    </div>
+
+    <div id="page3" class="page">
+        <h1>عايزه تعرفي عايز اقولك اي؟؟!!</h1>
+        <div class="btn-group">
+            <button onclick="startPrank()">ايوا</button>
+            <button class="btn-no" onclick="showPage('page4')">لاااا</button>
+        </div>
+    </div>
+
+    <div id="page4" class="page">
+        <h1>ارجعي تاني اختاري (ايوا) 😒</h1>
+        <button onclick="showPage('page3')">حاضر 🙄</button>
+    </div>
 
     <script>
-        const btn = document.getElementById('main-btn');
-        const colors = ['#ff4d6d', '#c2185b', '#ff758f', '#a4133c', '#590d22'];
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
 
-        btn.addEventListener('click', () => {
-            // نخفي الزرار أول ما تدوس
-            btn.style.display = 'none';
+        function startPrank() {
+            // إخفاء كل الصفحات
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.body.style.background = '#fff0f3';
 
-            // نكرر الكلمة 150 مرة في كل حتة
-            for (let i = 0; i < 150; i++) {
-                setTimeout(() => {
-                    createZakri();
-                }, i * 30); // الكلمات تظهر ورا بعض بسرعة
+            // نظام توزيع الكلمات عشان ميركبوش على بعض
+            const rows = Math.floor(window.innerHeight / 50);
+            const cols = Math.floor(window.innerWidth / 100);
+            let delay = 0;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    setTimeout(() => {
+                        const el = document.createElement('div');
+                        el.className = 'zakri-item';
+                        el.innerText = 'ذاااكري';
+                        
+                        // حساب المكان بدقة (شبكة منظممة)
+                        const x = c * 100 + (Math.random() * 20);
+                        const y = r * 50 + (Math.random() * 10);
+                        
+                        el.style.left = x + 'px';
+                        el.style.top = y + 'px';
+                        el.style.fontSize = (Math.random() * 10 + 18) + 'px';
+                        el.style.color = ['#ff4d6d', '#c2185b', '#a4133c'][Math.floor(Math.random() * 3)];
+                        el.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+                        
+                        document.body.appendChild(el);
+                    }, delay);
+                    delay += 30; // تظهر ورا بعضها بشكل شيك
+                }
             }
-        });
-
-        function createZakri() {
-            const el = document.createElement('div');
-            el.className = 'zakri';
-            el.innerText = 'ذاااكري';
-            
-            // أماكن عشوائية
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight;
-            
-            // أحجام وزوايا عشوائية
-            const size = Math.floor(Math.random() * 30) + 20; // من 20 لـ 50 px
-            const rotation = Math.floor(Math.random() * 60) - 30; // زاوية ميل
-            const color = colors[Math.floor(Math.random() * colors.length)];
-
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            el.style.fontSize = size + 'px';
-            el.style.color = color;
-            el.style.setProperty('--rot', rotation + 'deg');
-
-            document.body.appendChild(el);
         }
     </script>
 </body>
